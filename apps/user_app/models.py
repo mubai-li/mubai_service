@@ -4,7 +4,7 @@ from utils import tool
 from apps.user_app import enums
 
 
-class User(AbstractUser):
+class UserModel(AbstractUser):
     id = models.AutoField(primary_key=True)
 
     username = models.CharField(max_length=20,
@@ -62,19 +62,6 @@ class User(AbstractUser):
 
     class Meta:
         db_table = "user_app_users"
-    def update(self, instance, validated_data):
-        """
-        :param instance:  是book这个对象
-        :param validated_data:  校验后的数据
-        :return:
-        """
-        instance.name = validated_data.get('name')
-        instance.price = validated_data.get('price')
-        instance.author = validated_data.get('author')
-        instance.publish = validated_data.get('publish')
-        instance.save()  # book.save() 是django的orm提供的
-        return instance
 
-    def create(self, validated_data):
-        instance = models.Book.objects.create(**validated_data)
-        return instance
+
+

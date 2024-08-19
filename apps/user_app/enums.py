@@ -11,4 +11,3 @@ class UserSignState(IntChoicesBaseEnum):
     OUT = "注销"
 
 
-print(UserGender.__dict__)

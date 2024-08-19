@@ -15,7 +15,7 @@ from django.core.cache import cache,caches,ConnectionProxy
 from django_redis import get_redis_connection
 from django_redis.cache import RedisCache
 # 示例操作
-# cache.set('my_key', 'my_value')
+# cache.set('my_key', 'my_value',20)
 cache:RedisCache
 value = cache.get('my_key')
 print(value)  # 输出: my_value
@@ -26,9 +26,15 @@ print(value)  # 输出: my_value
 # print(type(cache._connections['default']))
 # redis_conn = get_redis_connection("default")
 
-
+print(cache.pttl("my_key"))
+print(cache.pttl("my_key"))
+print(cache.pttl("my_key"))
+print(cache.ttl("my_key"))
+print(cache.ttl("my_key"))
 print(cache.ttl("my_key"))
 print(cache.pttl("my_key"))
+
+
 # 查看缓存的剩余过期时间（以秒为单位）
 # ttl = redis_conn.ttl("my_key")
 # print(f"Remaining TTL for 'my_key': {ttl} seconds")
@@ -37,15 +43,16 @@ print(cache.pttl("my_key"))
 # value = cache.get('my_key')
 # print(f"Value of 'my_key': {value}")
 
-last = ConnectionProxy(caches,"last")
+last = ConnectionProxy(caches,"encryption")
 
 print(last)
 
-last.set('my_key1', 'my_value')
+# last.set('my_key1', 'my_value',24*60*60)
+# last.set('my_key1', 'my_value',24*60*60)
 
 
 value = last.get('my_key1')
 print(value)  # 输出: my_value
-
+print(value is None)
 value = last.get('my_key')
 print(value)  # 输出: my_value

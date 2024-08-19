@@ -2,7 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+from mubai_service import settings
 
 def main(args):
     """Run administrative tasks."""
@@ -19,6 +19,9 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    args = ["manage.py", "runserver", "127.0.0.1:8000"]
+    if settings.DEBUG:
+        args = sys.argv
+        # args = ["manage.py", "runserver", "127.0.0.1:8000"]
+    else:
+        args = ["manage.py", "runserver", "127.0.0.1:8000"]
     main(args)
