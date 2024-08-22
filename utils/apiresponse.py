@@ -27,7 +27,7 @@ class APIResponse(Response):
             'msg': msg,
         }
         if data: dic['data'] = data
-        if session_data: dic['session_data'] = data
+        if session_data: dic['session_data'] = session_data
         dic.update(kwargs)
         super(APIResponse, self).__init__(
             data=dic,

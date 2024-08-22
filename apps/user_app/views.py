@@ -3,7 +3,7 @@ from rest_framework import generics
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 
-
+from utils.apiresponse import APIResponse
 from rest_framework.response import Response
 from rest_framework.request import Request
 # Create your views here.
@@ -44,4 +44,4 @@ class UserView(generics.GenericAPIView):
         # if user_ser.is_valid():
         #     user_ser.save()
         #     return Response()
-        return Response("")
+        return APIResponse(data = "123")
