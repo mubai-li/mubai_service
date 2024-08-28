@@ -7,23 +7,34 @@ from apps.user_app import enums
 class UserModel(AbstractUser):
     id = models.AutoField(primary_key=True)
 
-    username = models.CharField(max_length=20,
-                                null=False,
-                                blank=False,
-                                verbose_name="用户名",
-                                unique=True)
-    u_name = models.CharField(max_length=50,
-                              null=True,
-                              blank=True,
-                              default=None,
-                              verbose_name="所属人姓名"
-                              )
-    password = models.CharField(max_length=50,
-                                null=False,
-                                blank=False,
-                                default="123456",
-                                verbose_name="密码"
-                                )
+    username = models.CharField(
+        max_length=20,
+        null=False,
+        blank=False,
+        verbose_name="用户名",
+        unique=True
+    )
+
+    u_name = models.CharField(
+        max_length=50,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name="所属人姓名"
+    )
+
+    password = models.CharField(
+        max_length=50,
+        null=False,
+        blank=False,
+        default="123456",
+        verbose_name="密码"
+    )
+
+    icon = models.ImageField(
+        upload_to='icon',
+        default='media/icon/default.png'
+    )  # 需要配media文件夹，上传的文件就会放到media文件夹下的icon
 
     gender = models.PositiveSmallIntegerField(
         choices=tool.get_int_choices_enum_choices(enums.UserGender),
@@ -38,7 +49,8 @@ class UserModel(AbstractUser):
         default=enums.UserSignState.IN,
         null=False,
         blank=False,
-        verbose_name="在线状态")
+        verbose_name="在线状态"
+    )
 
     registration_time = models.DateTimeField(
         auto_now_add=True,
@@ -62,6 +74,3 @@ class UserModel(AbstractUser):
 
     class Meta:
         db_table = "user_app_users"
-
-
-

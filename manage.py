@@ -4,6 +4,7 @@ import os
 import sys
 from mubai_service import settings
 
+
 def main(args):
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mubai_service.settings')

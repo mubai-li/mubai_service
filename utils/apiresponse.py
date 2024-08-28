@@ -34,4 +34,5 @@ class APIResponse(Response):
             status=status,
             headers=headers,
             exception=exception,
-            content_type=content_type)
+            content_type=content_type
+        )

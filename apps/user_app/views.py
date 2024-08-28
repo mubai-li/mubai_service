@@ -10,38 +10,43 @@ from rest_framework.request import Request
 from apps.user_app import models
 from apps.user_app import user_app_serializers
 from django.utils.decorators import method_decorator
+from django.contrib.auth import authenticate
+from rest_framework_jwt.settings import api_settings
+
+
 # Request._request : HttpRequest
 
-class UserView(generics.GenericAPIView):
+
+class UserLogin(generics.GenericAPIView):
+    queryset = models.UserModel.objects.all()
+    serializer_class = user_app_serializers.UserModelSerializer
+
+    def get(self, request, *args, **kwargs):
+        return APIResponse(data=1)
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+            jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
+            payload = jwt_payload_handler(user)
+            token = jwt_encode_handler(payload)
+
+            return APIResponse(meg='Logged in successfully')
+        else:
+            return APIResponse(msg='Invalid credentials')
+
+
+class UserRegister(generics.GenericAPIView):
     queryset = models.UserModel.objects
     serializer_class = user_app_serializers.UserModelSerializer
 
     def get(self, request: Request, *args, **kwargs):
-
-        # print(request.auth)
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        # print(x_forwarded_for)
-        # print(request.get_host)
-        # print(request._request.get_host())
-        # print(request.get_port())
-        # print(request._request.META)
-        # print(request._request.META.get('HTTP_X_FORWARDED_FOR'))
-        # print(request._request.META.get('REMOTE_ADDR'))  # 获取客户端的ip用来做服务通信
-        # print(request.user)
-
-        return Response("1")
-
+        return APIResponse(data=1)
 
     def post(self, request: Request, *args, **kwargs):
-        print(request.data)
-        # print(request.DATA)
-        # pass
-        # user_ser: user_app_serializers.UserModelSerializer = self.get_serializer(date=request.data)
-        # # user_ser =  user_app_serializers.UserModelSerializer(data=request.data)
-        #
-        #
-        #
-        # if user_ser.is_valid():
-        #     user_ser.save()
-        #     return Response()
-        return APIResponse(data = "123")
+        return APIResponse(data="123")

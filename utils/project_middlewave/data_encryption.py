@@ -21,7 +21,7 @@ import base64
 
 class Serialization(AbstractSingleton):
     @classmethod
-    def generate_key(cls):
+    def generate_key(cls) -> tuple[bytes, bytes]:
         private_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
         serialized_private_key = private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
@@ -41,7 +41,7 @@ class Serialization(AbstractSingleton):
             serialized_private_key,
             serialized_public_key,
 
-    ):
+    ) -> bytes:
         private_key = serialization.load_pem_private_key(
             serialized_private_key,
             password=None,
@@ -57,7 +57,7 @@ class Serialization(AbstractSingleton):
                             length=32,
                             salt=None,
                             info=b'handshake data',
-                            ):
+                            ) -> bytes:
         derived_key = HKDF(
             algorithm=algorithm,
             length=length,
@@ -67,7 +67,7 @@ class Serialization(AbstractSingleton):
         return derived_key
 
     @classmethod
-    def aes_encryption(cls, key, data: str):
+    def aes_encryption(cls, key, data: str) ->bytes:
         data = data.encode("utf-8")
         sha256 = hashlib.sha256()
         sha256.update(key)
@@ -81,7 +81,7 @@ class Serialization(AbstractSingleton):
         return ct
 
     @classmethod
-    def aes_decrypt(cls, key, ct: bytes):
+    def aes_decrypt(cls, key, ct: bytes) -> bytes:
         sha256 = hashlib.sha256()
         sha256.update(key)
         hash_value = sha256.digest()
@@ -94,11 +94,11 @@ class Serialization(AbstractSingleton):
         return data
 
     @classmethod
-    def b85_decode(cls, key: bytes):
+    def b85_decode(cls, key: bytes) -> str:
         return base64.b85encode(key).decode()
 
     @classmethod
-    def b85_encode(cls, key: str):
+    def b85_encode(cls, key: str) -> bytes:
         return base64.b85decode(key)
 
 
@@ -119,7 +119,6 @@ class HashesSHA(Enum):
 
 class DataEncryptionMiddleware(MiddlewareMixin):
     def process_request(self, request: WSGIRequest):
-        print(request.body.decode())
         json_data = json.loads(request.body.decode())
 
         session_data = json_data.get("session_data")
@@ -138,7 +137,7 @@ class DataEncryptionMiddleware(MiddlewareMixin):
             else:
                 return
 
-        elif encryption_key is None and session_key is None:
+        elif encryption_key is None:
 
             url = request.META.get("PATH_INFO")
 
@@ -148,9 +147,8 @@ class DataEncryptionMiddleware(MiddlewareMixin):
             headers["Session-Key"] = Serialization.b85_decode(serialized_public_key)
             return APIResponse(ResponseCode.REDIRECTKEY, data={'url': url}, headers=headers)
         elif not isinstance(encryption_key, list) and session_key:
-
+            # 存储并解密
             share_key = Serialization.genrate_shared_key(encryption_key, session_key)
-
             encryption_key_cache.set(host, [encryption_key, share_key])
             if session_data is not None:
                 data = Serialization.aes_decrypt(share_key, Serialization.b85_encode(session_data))
@@ -158,8 +156,32 @@ class DataEncryptionMiddleware(MiddlewareMixin):
                 request._body = json.dumps(json_data)
             return
         return
+
     def process_response(self, request, response: Response):
-        print(type(response))
-        print(response.data)
-        print(response.context_data)
+        session_data = response.data.get("session_data")
+        if session_data is None:
+            return None
+        host = request.META.get('REMOTE_ADDR')
+        encryption_key = encryption_key_cache.get(host)
+        headers = request.headers
+        session_key = headers.get("Session-Key")
+        if isinstance(encryption_key, list):
+            if session_data:
+                share_key = encryption_key[1]
+                data = Serialization.aes_encryption(share_key, json.dumps(session_data))
+                response.data["session_data"] = Serialization.b85_decode(data)
+            return response
+        elif encryption_key is None:
+            url = request.META.get("PATH_INFO")
+            serialized_private_key, serialized_public_key = Serialization.generate_key()
+            encryption_key_cache.set(host, serialized_private_key, caches_time)
+            headers["Session-Key"] = Serialization.b85_decode(serialized_public_key)
+            return APIResponse(ResponseCode.REDIRECTKEY, data={'url': url}, headers=headers)
+        elif not isinstance(encryption_key, list) and session_key:
+            share_key = Serialization.genrate_shared_key(encryption_key, session_key)
+            encryption_key_cache.set(host, [encryption_key, share_key])
+            if session_data is not None:
+                data = Serialization.aes_encryption(share_key, json.dumps(session_data))
+                response.data["session_data"] = Serialization.b85_decode(data)
+            return response
         return response
