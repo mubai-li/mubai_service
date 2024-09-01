@@ -2,11 +2,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from utils import tool
 from apps.user_app import enums
+from django.utils.translation import gettext_lazy
 
 
 class UserModel(AbstractUser):
     id = models.AutoField(primary_key=True)
-
     username = models.CharField(
         max_length=20,
         null=False,
@@ -14,7 +14,6 @@ class UserModel(AbstractUser):
         verbose_name="用户名",
         unique=True
     )
-
     u_name = models.CharField(
         max_length=50,
         null=True,
@@ -22,20 +21,17 @@ class UserModel(AbstractUser):
         default=None,
         verbose_name="所属人姓名"
     )
-
     password = models.CharField(
         max_length=50,
         null=False,
         blank=False,
-        default="123456",
+        default="AB12345678@",
         verbose_name="密码"
     )
-
     icon = models.ImageField(
         upload_to='icon',
         default='media/icon/default.png'
     )  # 需要配media文件夹，上传的文件就会放到media文件夹下的icon
-
     gender = models.PositiveSmallIntegerField(
         choices=tool.get_int_choices_enum_choices(enums.UserGender),
         default=enums.UserGender.GN.intvalue,
@@ -43,15 +39,14 @@ class UserModel(AbstractUser):
         blank=True,
         verbose_name="性别"
     )
-
+    email = models.EmailField(gettext_lazy("email address"), null=True, blank=True)
     is_active = models.BooleanField(
         choices=tool.get_int_choices_enum_choices(enums.UserSignState),
-        default=enums.UserSignState.IN,
+        default=bool(enums.UserSignState.IN),
         null=False,
         blank=False,
-        verbose_name="在线状态"
+        verbose_name="是否注销"
     )
-
     registration_time = models.DateTimeField(
         auto_now_add=True,
         auto_now=False,
@@ -61,11 +56,8 @@ class UserModel(AbstractUser):
         auto_now=True,
         verbose_name="更新时间"
     )
-
     first_name = None
-    email = None
     date_joined = None
-
     last_name = None
     is_staff = None
 
@@ -73,4 +65,4 @@ class UserModel(AbstractUser):
         return self.username
 
     class Meta:
-        db_table = "user_app_users"
+        db_table = "apps_user"

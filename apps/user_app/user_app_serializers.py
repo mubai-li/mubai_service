@@ -4,30 +4,36 @@ from django.core.exceptions import ValidationError
 from apps.user_app import models
 import re
 from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
+from django.apps import apps
+from django.contrib.auth.hashers import make_password
 
 
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserModel
-        fields = ("username", "u_name", "password", "gender", "is_active")
-
-    def validate(self, data):
-        email = data.get('email')
-        if email:
-            if not self.is_valid_email(email):
-                raise serializers.ValidationError({"email": "Invalid email format"})
-        return data
-
-    def is_valid_email(self, email):
-        try:
-            validate_email(email)
-            return True
-        except ValidationError:
-            return False
+        fields = ("username", "u_name", "password", "gender")
 
     def create(self, validated_data):
-        # models.User.objects.create(**validated_data)  # 这个密码不会加密
-        user = models.UserModel.objects.create_user(**validated_data)
+        username = validated_data.pop("username")
+        password = validated_data.pop("password")
+        email = validated_data.pop("email", None)
+
+        if not username:
+            raise ValueError("The given username must be set")
+        if email is not None:
+            email = models.UserModel.objects.normalize_email(email)
+        # Lookup the real model class from the global app registry so this
+        # manager method can be used in migrations. This is fine because
+        # managers are by definition working on the real model.
+        GlobalUserModel = apps.get_model(
+            models.UserModel.objects.model._meta.app_label,
+            models.UserModel.objects.model._meta.object_name
+        )
+        username = GlobalUserModel.normalize_username(username)
+        user = models.UserModel.objects.model(username=username, email=email, **validated_data)
+        user.password = make_password(password)
+        user.save(using=models.UserModel.objects._db)
+
         return user
 
 
