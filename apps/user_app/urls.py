@@ -8,6 +8,6 @@ router = SimpleRouter()
 router.register('register', views.UserRegisterView, 'register')
 urlpatterns = [
     path('login/', views.UserLoginView.as_view(actions={'post': 'post'})),
-    # path('register/', views.UserRegisterView.as_view(actions={'post': 'post'})),
+    path('logout/', views.LogoutView.as_view()),
 ]
 urlpatterns.extend(router.urls)

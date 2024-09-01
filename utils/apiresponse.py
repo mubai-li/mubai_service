@@ -21,7 +21,8 @@ class APIResponse(Response):
             headers=None,
             exception=False,
             content_type=None,
-            **kwargs):
+            **kwargs
+    ):
         dic = {
             'code': code.value,
             'msg': msg,

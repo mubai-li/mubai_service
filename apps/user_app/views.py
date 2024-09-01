@@ -3,30 +3,31 @@ from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateMo
 from rest_framework.viewsets import GenericViewSet, ViewSetMixin
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.authtoken import models as auth_models
+from rest_framework import permissions
 from rest_framework import generics
 from apps.user_app import user_app_serializers
 from apps.user_app import models
-
-
-
+from utils.apiresponse import ResponseCode, APIResponse
+from rest_framework import authentication
+from rest_framework import views
 
 
 # Request._request : HttpRequest
 class UserLoginView(ViewSetMixin, generics.GenericAPIView):
     # 使用ViewSetMixin，和APIView要把ViewSetMixin放在前面，因为两个都有as_view方法，而只有ViewSetMixin中才能输入action参数
     queryset = models.UserModel.objects.all()
-    serializer_class = user_app_serializers.UserModelSerializer
+    serializer_class = user_app_serializers.LoginModelSerializer
 
     def post(self, request: Request, *args, **kwargs):
         # 1 需要有个序列化的类
         login_ser = self.get_serializer(data=request.data, context={'request': request})
         # 2 生成序列化类对象
         # 3 调用序列号对象的is_valid
-        login_ser.is_valid(raise_exception=True)  # 判断用户是否村子啊啊
+        login_ser.is_valid(raise_exception=False)  # 判断用户是否村子啊啊
         token = login_ser.context.get('token')
         username = login_ser.context.get('username')
-        # 4 return
-        return Response({'status': 200, 'msg': '登录成功', 'token': token, 'username': username})
+        return APIResponse(code=ResponseCode.SUCCESS, msg="登录成功", token=token, username=username)
 
 
 class UserRegisterView(GenericViewSet, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin):
@@ -42,3 +43,30 @@ class UserRegisterView(GenericViewSet, CreateModelMixin, RetrieveModelMixin, Upd
             return user_app_serializers.UserReadOnlyModelSerializer
         elif self.action == 'update':
             return user_app_serializers.UserImageModelSerializer
+
+
+class LogoutView(views.APIView):
+    authentication_classes = (authentication.TokenAuthentication,)
+
+    # permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        print(request)
+        print(request.user)
+        print(request.user.is_authenticated)
+
+        # print(permissions.IsAuthenticated(request))
+        # token = request.user
+        # print(token)
+        # print(dir(token))
+
+        # 删除用户的令牌
+        # try:
+        #     token = auth_models.Token.objects.get(user=request.user)
+        #     print(token)
+        #     token.delete()
+        # except auth_models.Token.DoesNotExist:
+        #     pass
+
+        # return Response({'status': 200, 'msg': '注销成功'})
+        return APIResponse(code=ResponseCode.SUCCESS, msg='注销成功')
