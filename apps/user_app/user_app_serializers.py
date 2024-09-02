@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from apps.user_app import models
 import re
 from rest_framework_jwt.utils import jwt_encode_handler, jwt_payload_handler
 from django.apps import apps
 from django.contrib.auth.hashers import make_password
+from rest_framework.authtoken import models as auth_models
+from mubai_service import settings
 
 
 class UserModelSerializer(serializers.ModelSerializer):
@@ -68,14 +69,22 @@ class LoginModelSerializer(serializers.ModelSerializer):
             user = models.UserModel.objects.filter(email=username).first()
         else:
             user = models.UserModel.objects.filter(username=username).first()
+
         if user:
             # 校验密码,因为是密文，要用check_password
             if user.check_password(password):
                 # 签发token
-                payload = jwt_payload_handler(user)
-                token = jwt_encode_handler(payload)
-                self.context['token'] = token
+                if settings.JWTToken:
+                    payload = jwt_payload_handler(user)
+                    token = jwt_encode_handler(payload)
+                    self.context['token'] = token
+                else:
+                    token, created = auth_models.Token.objects.get_or_create(user=user)
+                    token: auth_models.Token
+                    self.context['token'] = token.key
+                self.context['user'] = user
                 self.context['username'] = username
+
                 return attrs
             else:
                 raise ValidationError('密码错误')

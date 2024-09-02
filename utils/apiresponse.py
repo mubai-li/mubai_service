@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.response import Response
 from enum import Enum, auto
 
@@ -30,6 +32,7 @@ class APIResponse(Response):
         if data: dic['data'] = data
         if session_data: dic['session_data'] = session_data
         dic.update(kwargs)
+
         super(APIResponse, self).__init__(
             data=dic,
             status=status,
