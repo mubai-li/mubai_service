@@ -1,21 +1,19 @@
 # Create your views here.
 from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.viewsets import GenericViewSet, ViewSetMixin
-from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import permissions
 from rest_framework import generics
 from apps.user_app import user_app_serializers
 from apps.user_app import models
 from utils.apiresponse import ResponseCode, APIResponse
-from rest_framework import authentication
 from rest_framework import views
 from rest_framework.authtoken import models as auth_models
 
 
 # Request._request : HttpRequest
 class UserLoginView(ViewSetMixin, generics.GenericAPIView):
-    # 使用ViewSetMixin，和APIView要把ViewSetMixin放在前面，因为两个都有as_view方法，而只有ViewSetMixin中才能输入action参数
+    # 使用ViewSetMixin，和APIView要把ViewSetMixin放在前面，因为两---个都有as_view方法，而只有ViewSetMixin中才能输入action参数
     queryset = models.UserModel.objects.all()
     serializer_class = user_app_serializers.LoginModelSerializer
 
@@ -47,7 +45,7 @@ class UserRegisterView(GenericViewSet, CreateModelMixin, RetrieveModelMixin, Upd
 
 
 class UserLogoutView(views.APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = permissions.IsAuthenticated,
 
     def post(self, request, *args, **kwargs):
         # 删除用户的令牌
@@ -59,4 +57,3 @@ class UserLogoutView(views.APIView):
 
         # return Response({'status': 200, 'msg': '注销成功'})
         return APIResponse(code=ResponseCode.SUCCESS, msg='注销成功')
-

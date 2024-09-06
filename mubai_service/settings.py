@@ -20,6 +20,7 @@ if not DEBUG:
     }
 # 添加media
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # 添加静态文件
 STATIC_URL = '/static/'
@@ -59,6 +60,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PARSER_CLASSES': [  # 默认分析器类
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',  # 添加 MultiPartParser
+        'rest_framework.parsers.FileUploadParser',  # 添加 FileUploadParser
     ],
     'DEFAULT_FILTER_BACKENDS': []
 }

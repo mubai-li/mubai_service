@@ -7,13 +7,13 @@ from apps.user_app.models import UserModel
 
 class FileModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_path = models.FilePathField(verbose_name="文件路径")
+    file_path = models.FilePathField(unique=True,verbose_name="文件路径")
     title = models.CharField(max_length=100, verbose_name="标题")
-    file_type = models.ForeignKey(to="FileTypeModel", null=True, blank=False, on_delete=models.SET_NULL, verbose_name="文件类型")
+    file_type = models.ForeignKey(to="FileTypeModel", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="文件类型")
     user = models.ForeignKey(to=UserModel, on_delete=models.CASCADE)
     file_label = models.ManyToManyField(
         to="FileLabelModel",
-        through="File_FileLabelModel",
+        through="FileAndFileLabelModel",
         through_fields=('files', 'file_labels')
     )
 
@@ -26,7 +26,7 @@ class FileModel(models.Model):
 
 class FileTypeModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_type = models.CharField(max_length=20, null=True, blank=True, verbose_name="文件类型")
+    file_type = models.CharField(max_length=20, null=True, blank=True, unique=True,verbose_name="文件类型")
     file_type_remark = models.TextField()
 
     def __str__(self):
@@ -36,9 +36,10 @@ class FileTypeModel(models.Model):
         db_table = "apps_file_type"
 
 
+#
 class FileLabelModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_label = models.CharField(max_length=24, null=True, blank=True, verbose_name="文件标签")
+    file_label = models.CharField(max_length=24, null=True, blank=True,unique=True, verbose_name="文件标签")
 
     def __str__(self):
         return self.file_label
@@ -47,7 +48,7 @@ class FileLabelModel(models.Model):
         db_table = "apps_file_label"
 
 
-class File_FileLabelModel(models.Model):
+class FileAndFileLabelModel(models.Model):
     id = models.AutoField(primary_key=True)
     files = models.ForeignKey(to="FileModel", on_delete=models.CASCADE)
     file_labels = models.ForeignKey(to="FileLabelModel", on_delete=models.CASCADE)

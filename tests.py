@@ -1,22 +1,34 @@
-from django.test import TestCase
+# class IsAuthenticated():
+#     """
+#     Allows access only to authenticated users.
+#     """
+#
+#     def has_permission(self, request, view):
+#         return bool(request.user and request.user.is_authenticated)
+#
 
-# Create your tests here.
-import os
-from mubai_service import settings
+# def wapper(obj, *args):
+#     return obj
 
-if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings.__name__)
-    import django
-    import sys
 
-    django.setup()
+def wapper(*args):
+    datas = [*args]
 
-    from rest_framework.routers import SimpleRouter
+    class IsDatas():
 
-    from apps.user_app import views
+        def has_permission(self, data):
+            if data in datas:
+                return True
+            return False
 
-    router = SimpleRouter()
-    router.register('register', views.UserRegisterView, 'register')
+    return IsDatas
 
-    print(router.routes)
-    print(router.urls)
+
+one = wapper(1, 2, 3, 4)()
+
+
+print(one.has_permission(1))
+two = wapper(5, 6, 7, 8)()
+
+
+print(two.has_permission(1))

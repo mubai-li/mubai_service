@@ -12,7 +12,7 @@ from mubai_service import settings
 class UserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserModel
-        fields = ("username", "u_name", "password", "gender")
+        fields = "username", "u_name", "password", "gender"
 
     def create(self, validated_data):
         username = validated_data.pop("username")
@@ -42,13 +42,13 @@ class UserReadOnlyModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserModel
         # fields = '__all__'
-        fields = ['username', 'icon']
+        fields = 'username', 'icon'
 
 
 class UserImageModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserModel
-        fields = ['icon']
+        fields = 'icon',
 
 
 class LoginModelSerializer(serializers.ModelSerializer):
@@ -56,7 +56,7 @@ class LoginModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.UserModel
-        fields = ['username', 'password']
+        fields = 'username', 'password'
 
     def validate(self, attrs):
         # 在这里写逻辑

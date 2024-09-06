@@ -1,14 +1,28 @@
+import copy
+import os.path
+from codecs import encode
 from http import client
-
+import mimetypes
 import json
+
+import requests
+from client_test.util import _encode_files
 
 
 class APIResponse:
     def __init__(self, response: client.HTTPResponse):
         self._response = response
-        self._data = json.loads(self._response.read().decode())
-        self._code = self._data.pop("code", None)
-        self._msg = self._data.pop("msg", None)
+        data = self._response.read().decode()
+
+        if self.status == 200:
+            self._data = json.loads(data)
+            self._code = self._data.pop("code", None)
+            self._msg = self._data.pop("msg", None)
+
+        else:
+            self._data = data
+            self._code = None
+            self._msg = None
 
     @property
     def data(self):
@@ -47,6 +61,7 @@ class APIHTTPConnection(client.HTTPConnection):
 
 class Client:
     JWTToken = True
+
     def __init__(self):
         self._username = "mubai"
         self._password = "lb12345678@"
@@ -54,17 +69,23 @@ class Client:
             "Content-Type": "application/json"
         }
         # self._host = "172.23.80.150"
-        self._host = "192.168.13.37"
+        # self._host = "192.168.13.37"
+        # self._host = "192.168.12.130"
+        self._host = "127.0.0.1"
         self._port = 8000
         self.con = APIHTTPConnection(self._host, self._port)
 
-    def post_request(self, url: str, body=None):
-        self.con.request(method="POST", url=url, headers=self._headers, body=body)
+    def post_request(self, url: str, body=None, headers=None):
+        if headers is None:
+            headers = self._headers
+        self.con.request(method="POST", url=url, headers=headers, body=body)
         response = self.con.getresponse()
         return response
 
-    def get_request(self, url: str, body=None):
-        self.con.request(method="GET", url=url, headers=self._headers, body=body)
+    def get_request(self, url: str, body=None, headers=None):
+        if headers is None:
+            headers = self._headers
+        self.con.request(method="GET", url=url, headers=headers, body=body)
         response = self.con.getresponse()
         return response
 
@@ -101,26 +122,33 @@ class Client:
     def user_logout(self):
         url = "/user/logout/"
         response = self.post_request(url)
-        print(response.data)
-        print(response.code)
-        print(response.msg)
 
+    def upload_file(self, file_path: str):
+        url = "/file/upload/"
+        header = copy.copy(self._headers)
+        with open(file_path, 'rb') as f:
+            file_content = f.read()
+            body = {os.path.basename(file_path): file_content}
 
-    def test(self):
-        url = "/user/test/"
-        response = self.post_request(url)
-        print(response.data)
-        print(response.code)
-        print(response.msg)
+            body, content_type = _encode_files(body, {})
+            header["Content-Type"] = content_type
+            response = self.post_request(url, body=body, headers=header)
+
+        return response
 
 
 if __name__ == '__main__':
+    Client.JWTToken = True
     client = Client()
     # client.register()
     res = client.user_login()
 
-    client.user_logout()
-    client.user_logout()
-    client.user_logout()
-    client.user_logout()
+    # print(res.headers)
+    print(client._headers)
+    res = client.upload_file(r"C:\Users\32509\Desktop\Project\日月新\002+006图纸及表格数据-20240511.rar")
+
+    # client.user_logout()
+    # client.user_logout()
+    # client.user_logout()
+    # client.user_logout()
     # client.user_logout()
