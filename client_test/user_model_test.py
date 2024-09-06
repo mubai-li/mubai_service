@@ -124,7 +124,7 @@ class Client:
         response = self.post_request(url)
 
     def upload_file(self, file_path: str):
-        url = "/file/upload/"
+        url = "/file/file/"
         header = copy.copy(self._headers)
         with open(file_path, 'rb') as f:
             file_content = f.read()
@@ -136,19 +136,32 @@ class Client:
 
         return response
 
+    def add_file_type(self, file_type):
+        url = "/file/type/"
+        self.post_request(url, body=json.dumps(file_type))
+
+    def add_file_label(self, file_type):
+        url = "/file/label/"
+        self.post_request(url, body=json.dumps(file_type))
+
 
 if __name__ == '__main__':
     Client.JWTToken = True
     client = Client()
     # client.register()
     res = client.user_login()
+    # res = client.upload_file(r"C:\Users\32509\Desktop\Project\日月新\002+006图纸及表格数据-20240511.rar")
 
+    # client.add_file_type({
+    #     "file_type": "file",
+    #     "file_type_remark": "1"
+    # })
+    # client.add_file_label({
+    #     "": ""
+    # })
     # print(res.headers)
     print(client._headers)
-    res = client.upload_file(r"C:\Users\32509\Desktop\Project\日月新\002+006图纸及表格数据-20240511.rar")
 
     # client.user_logout()
-    # client.user_logout()
-    # client.user_logout()
-    # client.user_logout()
-    # client.user_logout()
+
+    #

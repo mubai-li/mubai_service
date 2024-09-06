@@ -48,16 +48,15 @@ class UpAndDownFileGAPIView(generics.GenericAPIView):
         return APIResponse(code=ResponseCode.ERROR, msg='文件没有发现')
 
     def post(self, request: request.Request):
+        # user: models.UserModel = request.user
 
-        # print(request.user)
-        # print(type(request.user))
-        user: models.UserModel
-        # print(request.FILES)
-        # print(file_obj)
+        file_dir_path = os.path.join(settings.FILE_SAVE_BASE_PATH, request.user.id)
         for file_name, file_obj in request.FILES.items():
             # print(file_obj)
             # print(file_name, file_obj.name)
-            file_name = default_storage.save(file_name, ContentFile(file_obj.read()))
+
+            file_name = default_storage.save(os.path.join(file_dir_path, file_name), ContentFile(file_obj.read()))
+
         # print(file_name)
         #     file_path = default_storage.path(file_name)
         # print(file_path)
@@ -78,12 +77,22 @@ class UpAndDownFileGAPIView(generics.GenericAPIView):
 
 class FileTypeView(generics.GenericAPIView):
     permission_classes = permissions.IsAuthenticated,
-    serializer_class = file_app_serializers.FileSerializer
+    serializer_class = file_app_serializers.FileTypeSerializer
 
     def post(self, request: request.Request):
-        pass
+        file_type_ser: file_app_serializers.FileTypeSerializer = self.get_serializer(data=request.data)
+        if file_type_ser.is_valid():
+            file_type_ser.save()
+            return APIResponse(code=ResponseCode.SUCCESS, msg="文件类型添加成功")
+        return APIResponse(code=ResponseCode.ERROR, msg=file_type_ser.errors)
 
 
 class FileLabelView(generics.GenericAPIView):
+    permission_classes = permissions.IsAuthenticated,
+    serializer_class = file_app_serializers.FileLabelSerializer
+
     def post(self, request: request.Request):
-        pass
+        file_label_ser: file_app_serializers.FileTypeSerializer = self.get_serializer(data=request.data)
+        if file_label_ser.is_valid():
+            return APIResponse(code=ResponseCode.SUCCESS, msg="文件标签添加成功")
+        return APIResponse(code=ResponseCode.ERROR, msg=file_label_ser.errors)

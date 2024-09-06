@@ -7,7 +7,7 @@ from apps.user_app.models import UserModel
 
 class FileModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_path = models.FilePathField(unique=True,verbose_name="文件路径")
+    file_path = models.FilePathField(unique=True, verbose_name="文件路径")
     title = models.CharField(max_length=100, verbose_name="标题")
     file_type = models.ForeignKey(to="FileTypeModel", null=True, blank=True, on_delete=models.SET_NULL, verbose_name="文件类型")
     user = models.ForeignKey(to=UserModel, on_delete=models.CASCADE)
@@ -26,8 +26,8 @@ class FileModel(models.Model):
 
 class FileTypeModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_type = models.CharField(max_length=20, null=True, blank=True, unique=True,verbose_name="文件类型")
-    file_type_remark = models.TextField()
+    file_type = models.CharField(max_length=20, null=False, blank=False, unique=True, verbose_name="文件类型")
+    file_type_remark = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.file_type
@@ -39,7 +39,7 @@ class FileTypeModel(models.Model):
 #
 class FileLabelModel(models.Model):
     id = models.AutoField(primary_key=True)
-    file_label = models.CharField(max_length=24, null=True, blank=True,unique=True, verbose_name="文件标签")
+    file_label = models.CharField(max_length=24, null=True, blank=True, unique=True, verbose_name="文件标签")
 
     def __str__(self):
         return self.file_label

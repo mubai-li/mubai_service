@@ -1,34 +1,52 @@
-# class IsAuthenticated():
-#     """
-#     Allows access only to authenticated users.
-#     """
-#
-#     def has_permission(self, request, view):
-#         return bool(request.user and request.user.is_authenticated)
-#
 
-# def wapper(obj, *args):
-#     return obj
-
-
-def wapper(*args):
-    datas = [*args]
-
-    class IsDatas():
-
-        def has_permission(self, data):
-            if data in datas:
-                return True
-            return False
-
-    return IsDatas
-
-
-one = wapper(1, 2, 3, 4)()
-
-
-print(one.has_permission(1))
-two = wapper(5, 6, 7, 8)()
-
-
-print(two.has_permission(1))
+"""
+Package                 Version
+----------------------- -------------
+asgiref                 3.8.1
+async-timeout           4.0.3
+blinker                 1.4
+cffi                    1.17.0
+command-not-found       0.3
+cryptography            43.0.0
+dbus-python             1.2.18
+distro                  1.7.0
+distro-info             1.1+ubuntu0.1
+Django                  5.0.8
+django-filter           24.3
+django-redis            5.4.0
+djangorestframework     3.15.2
+djangorestframework-jwt 1.11.0
+httplib2                0.20.2
+importlib-metadata      4.6.4
+jeepney                 0.7.1
+keyring                 23.5.0
+launchpadlib            1.10.16
+lazr.restfulclient      0.14.4
+lazr.uri                1.0.6
+Markdown                3.7
+more-itertools          8.10.0
+mysqlclient             2.1.1
+netifaces               0.11.0
+oauthlib                3.2.0
+pillow                  10.4.0
+pip                     22.0.2
+pycparser               2.22
+PyGObject               3.42.1
+PyJWT                   1.7.1
+pyparsing               2.4.7
+python-apt              2.4.0+ubuntu2
+PyYAML                  5.4.1
+redis                   5.0.8
+SecretStorage           3.3.1
+setuptools              59.6.0
+six                     1.16.0
+sqlparse                0.5.1
+systemd-python          234
+typing_extensions       4.12.2
+ubuntu-advantage-tools  8001
+ufw                     0.36.1
+unattended-upgrades     0.1
+wadllib                 1.3.6
+wheel                   0.37.1
+zipp                    1.0.0
+"""
