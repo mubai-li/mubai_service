@@ -6,8 +6,14 @@ class UserGender(IntChoicesBaseEnum):
     FEMALE = "女"
     GN = "保密"
 
+
 class UserSignState(IntChoicesBaseEnum):
     IN = "注册"
     OUT = "注销"
 
+
+class UserPermission(Enum):
+    ADMIN = auto()
+    VIP = auto()
+    USER = auto()
 

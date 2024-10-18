@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from utils import tool
-from apps.user_app import enums
+from apps.user_app import user_enums
 from django.utils.translation import gettext_lazy
 
 
@@ -33,16 +33,22 @@ class UserModel(AbstractUser):
         default='media/icon/default.png'
     )  # 需要配media文件夹，上传的文件就会放到media文件夹下的icon
     gender = models.PositiveSmallIntegerField(
-        choices=tool.get_int_choices_enum_choices(enums.UserGender),
-        default=enums.UserGender.GN.intvalue,
+        choices=tool.get_int_choices_enum_choices(user_enums.UserGender),
+        default=user_enums.UserGender.GN.intvalue,
         null=True,
         blank=True,
         verbose_name="性别"
     )
     email = models.EmailField(gettext_lazy("email address"), null=True, blank=True)
+    permissions = models.IntegerField(
+        default=user_enums.UserPermission.USER.value,
+        null=False,
+        blank=False,
+        verbose_name="权限"
+    )
     is_active = models.BooleanField(
-        choices=tool.get_int_choices_enum_choices(enums.UserSignState),
-        default=bool(enums.UserSignState.IN),
+        choices=tool.get_int_choices_enum_choices(user_enums.UserSignState),
+        default=bool(user_enums.UserSignState.IN),
         null=False,
         blank=False,
         verbose_name="是否注销"
