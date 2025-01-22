@@ -112,6 +112,7 @@ class Client:
             "password": self._password
         }
         response = self.post_request(url, json.dumps(body))
+        print(response)
         token = response.data.get('token')
         if self.JWTToken:
             self._headers["Authorization"] = f'JWT {token}'
@@ -150,7 +151,7 @@ if __name__ == '__main__':
     client = Client()
     # client.register()
     res = client.user_login()
-    # res = client.upload_file(r"C:\Users\32509\Desktop\Project\日月新\002+006图纸及表格数据-20240511.rar")
+    res = client.upload_file(r"C:\Users\32509\Desktop\Project\日月新\002+006图纸及表格数据-20240511.rar")
 
     # client.add_file_type({
     #     "file_type": "file",
@@ -160,8 +161,8 @@ if __name__ == '__main__':
     #     "": ""
     # })
     # print(res.headers)
-    print(client._headers)
-
+    # print(client._headers)
+    #
     # client.user_logout()
 
     #

@@ -20,6 +20,7 @@ def main(args):
 
 
 if __name__ == '__main__':
+
     if settings.DEBUG:
         args = sys.argv
         # args = ["manage.py", "runserver", "127.0.0.1:8000"]

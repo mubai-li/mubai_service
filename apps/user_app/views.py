@@ -32,7 +32,7 @@ class UserLoginView(ViewSetMixin, generics.GenericAPIView):
 class UserRegisterView(GenericViewSet, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin):
     queryset = models.UserModel.objects.all()
     serializer_class = user_app_serializers.UserModelSerializer
-
+    
     # 假设get请求和post请求，用的序列化类不一样如何处理
     # 重写get_serializer_class方法，返回啥，用的序列化类就是啥
     def get_serializer_class(self):

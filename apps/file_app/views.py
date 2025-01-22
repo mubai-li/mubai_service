@@ -9,10 +9,10 @@ from wsgiref.util import FileWrapper
 from mubai_service import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-
+from apps.file_app.tasks import upload_file_task
 from apps.file_app import file_app_serializers
 import os
-
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 # Create your views here.
 # views.py
@@ -25,7 +25,6 @@ def success(request):
 class UpAndDownFileGAPIView(generics.GenericAPIView):
     permission_classes = permissions.IsAuthenticated,
     serializer_class = file_app_serializers.FileSerializer
-
     def get(self, request: request.Request):
         task_file_id = request.query_params.get("task_file_id", None)
         if task_file_id is None:
@@ -49,13 +48,20 @@ class UpAndDownFileGAPIView(generics.GenericAPIView):
 
     def post(self, request: request.Request):
         # user: models.UserModel = request.user
-
-        file_dir_path = os.path.join(settings.FILE_SAVE_BASE_PATH, request.user.id)
+        #
+        # print(type(request.user.id))
+        print(str(request.user.id))
+        file_dir_path = os.path.join(settings.FILE_SAVE_BASE_PATH, str(request.user.id))
         for file_name, file_obj in request.FILES.items():
+            file_obj:InMemoryUploadedFile
             # print(file_obj)
             # print(file_name, file_obj.name)
-
-            file_name = default_storage.save(os.path.join(file_dir_path, file_name), ContentFile(file_obj.read()))
+            # 文件的上传
+            # file_name = default_storage.save(os.path.join(file_dir_path, file_name), ContentFile(file_obj.read()))
+            print(type(file_obj))
+            print(file_obj.file)
+            # file_name = default_storage.save(os.path.join(file_dir_path, file_name), file_obj)
+            # print(file_name)
 
         # print(file_name)
         #     file_path = default_storage.path(file_name)
@@ -72,6 +78,14 @@ class UpAndDownFileGAPIView(generics.GenericAPIView):
         #     user=user
         # )
         # file_model_obj.save()
+        # file_dir_path = os.path.join(settings.FILE_SAVE_BASE_PATH, request.user.id)
+        # 使用celer实现的文件上传
+        # for file_name, file_obj in request.FILES.items():
+            # print(file_obj)
+            # print(file_name, file_obj.name)
+            # 文件的上传
+            # file_name = default_storage.save(os.path.join(file_dir_path, file_name), ContentFile(file_obj.read()))
+            # upload_file_task(request.user.id, file_name, file_obj.read())
         return APIResponse(code=ResponseCode.SUCCESS, msg="文件上传成功", data={"file_id": 1})
 
 

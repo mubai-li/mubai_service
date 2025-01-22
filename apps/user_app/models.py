@@ -40,12 +40,12 @@ class UserModel(AbstractUser):
         verbose_name="性别"
     )
     email = models.EmailField(gettext_lazy("email address"), null=True, blank=True)
-    permissions = models.IntegerField(
-        default=user_enums.UserPermission.USER.value,
-        null=False,
-        blank=False,
-        verbose_name="权限"
-    )
+    # permissions = models.IntegerField(
+    #     default=user_enums.UserPermission.USER.value,
+    #     null=False,
+    #     blank=False,
+    #     verbose_name="权限"
+    # )
     is_active = models.BooleanField(
         choices=tool.get_int_choices_enum_choices(user_enums.UserSignState),
         default=bool(user_enums.UserSignState.IN),

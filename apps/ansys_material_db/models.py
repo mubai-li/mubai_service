@@ -40,7 +40,8 @@ class WorkbenchMaterialNameOption(models.Model):
     workbench_type = models.CharField(
         max_length=50,
         verbose_name="Workbench材料名字"
-    )  # 材料库的类型名字
+    )
+    # 材料库的类型名字
     workbench_classification = models.OneToOneField(
         to="WorkbenchMaterialClassificationOption",
         null=False,
