@@ -4,8 +4,9 @@ from email.header import Header
 import random
 from celery import shared_task
 from mubai_service import settings
-
+from utils.init_redis import verification_key_cache
 from django.core.mail import send_mail
+
 
 # 生成随机验证码
 def generate_verification_code(length=6):
@@ -37,7 +38,10 @@ def generate_verification_code(length=6):
 #     except Exception as e:
 #         print(f'邮件发送失败：{e}')
 @shared_task
-def send_verification_email_async(receiver_email, code):
+def send_verification_email_async(host, receiver_email):
+    code = generate_verification_code(length=6)
+    verification_key_cache.set(host, code, settings.verification_time)
+
     subject = '您的验证码'
     message = f'您的验证码是：{code}，请在 5 分钟内使用。'
     sender_email = settings.DEFAULT_FROM_EMAIL  # 从 settings.py 中获取发件人邮箱
@@ -54,9 +58,10 @@ def send_verification_email_async(receiver_email, code):
     except Exception as e:
         return f'邮件发送失败：{e}'
 
+
 # 示例：发送验证码
 if __name__ == '__main__':
     pass
     # receiver_email = 'receiver@example.com'  # 收件人邮箱
-    # verification_code = generate_verification_code()  # 生成验证码
+    verification_code = generate_verification_code()  # 生成验证码
     # send_verification_email(receiver_email, verification_code)  # 发送邮件
